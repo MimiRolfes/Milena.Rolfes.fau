@@ -1,38 +1,29 @@
 import { Node } from "./Node";
 import { Directory } from "./Directory";
+import { MethodFailedException } from "../common/MethodFailedException";
 
 export class Link extends Node {
 
-    protected targetNode: Node | null = null;
+    protected target: Node;
 
-    constructor(bn: string, pn: Directory, tn?: Node) {
-        super(bn, pn);
-
-        if (tn != undefined) {
-            this.targetNode = tn;
-        }
+    constructor(baseName: string, parent: Directory, target: Node) {
+        super(baseName, parent);
+        if (!target) throw new MethodFailedException();
+        this.target = target;
+        this.checkInvariants();
     }
 
-    public getTargetNode(): Node | null {
-        return this.targetNode;
+    public getTarget(): Node {
+        return this.target;
     }
 
-    public setTargetNode(target: Node): void {
-        this.targetNode = target;
+    public rename(newName: string): void {
+        super.rename(newName);
+        this.checkInvariants();
     }
 
-    public getBaseName(): string {
-        const target = this.ensureTargetNode(this.targetNode);
-        return target.getBaseName();
-    }
-
-    public rename(bn: string): void {
-        const target = this.ensureTargetNode(this.targetNode);
-        target.rename(bn);
-    }
-
-    protected ensureTargetNode(target: Node | null): Node {
-        const result: Node = this.targetNode as Node;
-        return result;
+    protected checkInvariants(): void {
+        super.checkInvariants();
+        if (!this.target) throw new MethodFailedException();
     }
 }

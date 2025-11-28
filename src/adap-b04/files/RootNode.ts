@@ -1,33 +1,19 @@
-import { Name } from "../names/Name";
-import { StringName } from "../names/StringName";
 import { Directory } from "./Directory";
+import { MethodFailedException } from "../common/MethodFailedException";
 
 export class RootNode extends Directory {
 
-    protected static ROOT_NODE: RootNode = new RootNode();
-
-    public static getRootNode() {
-        return this.ROOT_NODE;
-    }
-
     constructor() {
-        super("", new Object as Directory);
+        super("", null);
+        this.checkInvariants();
     }
 
-    protected initialize(pn: Directory): void {
-        this.parentNode = this;
+    public rename(): void {
+        throw new MethodFailedException();
     }
 
-    public getFullName(): Name {
-        return new StringName("", '/');
+    protected checkInvariants(): void {
+        super.checkInvariants();
+        if (this.getParent() !== null) throw new MethodFailedException();
     }
-
-    public move(to: Directory): void {
-        // null operation
-    }
-
-    protected doSetBaseName(bn: string): void {
-        // null operation
-    }
-
 }

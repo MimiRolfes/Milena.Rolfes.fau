@@ -1,52 +1,35 @@
-import { Name } from "../names/Name";
 import { Directory } from "./Directory";
+import { MethodFailedException } from "../common/MethodFailedException";
 
-export class Node {
+export abstract class Node {
 
-    protected baseName: string = "";
-    protected parentNode: Directory;
+    protected baseName: string;
+    protected parent: Directory | null;
 
-    constructor(bn: string, pn: Directory) {
-        this.doSetBaseName(bn);
-        this.parentNode = pn; // why oh why do I have to set this
-        this.initialize(pn);
-    }
-
-    protected initialize(pn: Directory): void {
-        this.parentNode = pn;
-        this.parentNode.addChildNode(this);
-    }
-
-    public move(to: Directory): void {
-        this.parentNode.removeChildNode(this);
-        to.addChildNode(this);
-        this.parentNode = to;
-    }
-
-    public getFullName(): Name {
-        const result: Name = this.parentNode.getFullName();
-        result.append(this.getBaseName());
-        return result;
+    constructor(baseName: string, parent: Directory | null) {
+        if (!baseName) throw new MethodFailedException();
+        this.baseName = baseName;
+        this.parent = parent;
+        this.checkInvariants();
     }
 
     public getBaseName(): string {
-        return this.doGetBaseName();
-    }
-
-    protected doGetBaseName(): string {
         return this.baseName;
     }
 
-    public rename(bn: string): void {
-        this.doSetBaseName(bn);
+    public getParent(): Directory | null {
+        return this.parent;
     }
 
-    protected doSetBaseName(bn: string): void {
-        this.baseName = bn;
+    public rename(newName: string): void {
+        if (!newName) throw new MethodFailedException();
+        const old = this.baseName;
+        this.baseName = newName;
+        if (this.baseName !== newName) throw new MethodFailedException();
+        this.checkInvariants();
     }
 
-    public getParentNode(): Directory {
-        return this.parentNode;
+    protected checkInvariants(): void {
+        if (!this.baseName) throw new MethodFailedException();
     }
-
 }

@@ -1,23 +1,37 @@
 import { Node } from "./Node";
+import { MethodFailedException } from "../common/MethodFailedException";
 
 export class Directory extends Node {
 
-    protected childNodes: Set<Node> = new Set<Node>();
+    protected children: Node[] = [];
 
-    constructor(bn: string, pn: Directory) {
-        super(bn, pn);
+    constructor(baseName: string, parent: Directory | null) {
+        super(baseName, parent);
+        this.checkInvariants();
     }
 
-    public hasChildNode(cn: Node): boolean {
-        return this.childNodes.has(cn);
+    public add(n: Node): void {
+        if (!n) throw new MethodFailedException();
+        if (this.children.includes(n)) throw new MethodFailedException();
+        this.children.push(n);
+        if (!this.children.includes(n)) throw new MethodFailedException();
+        this.checkInvariants();
     }
 
-    public addChildNode(cn: Node): void {
-        this.childNodes.add(cn);
+    public remove(n: Node): void {
+        if (!n) throw new MethodFailedException();
+        const before = this.children.length;
+        this.children = this.children.filter(c => c !== n);
+        if (this.children.length !== before - 1) throw new MethodFailedException();
+        this.checkInvariants();
     }
 
-    public removeChildNode(cn: Node): void {
-        this.childNodes.delete(cn); // Yikes! Should have been called remove
+    public list(): Node[] {
+        return this.children.slice();
     }
 
+    protected checkInvariants(): void {
+        super.checkInvariants();
+        if (!Array.isArray(this.children)) throw new MethodFailedException();
+    }
 }
